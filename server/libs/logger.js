@@ -1,15 +1,15 @@
 exports.error = (error) => {
-    console.log(error);
+    console.log("Error : %s", error);
 }
 
 exports.info = (info) => {
-    console.log(info);
+    console.log("Info : %s", info);
 }
 
 exports.warning = (message) => {
-    console.log(message);
+    console.log("Warning : %s", message);
 }
 
 exports.fatal = (error) => {
-    console.log(error);
+    console.log("Error fatal: %s", error);
 }

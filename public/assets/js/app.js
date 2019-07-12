@@ -1,115 +1,62 @@
 'use strict';
+$(document).ready(() => {
 
-$(function(){
+	const socket = io();
+	$('#comment').keypress((e) => {
+		const key = e.which || e.keyCode;
+		if (key === 13) {
+			sendMessageSender()
+		}
+	})
 
-});
+	$('#chat-send').click(() => {
+		sendMessageSender();
+	})
 
-const socket = io();
-const query = document.querySelector('#comment');
-const html = document.querySelector('#conversation');
-var is_chrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
 
-document.querySelector('#chat-send').addEventListener('click', () => {
-	var date = new Date();
-	var htmlResponse	=	"<div class=\"row message-body\">\
-	<div class=\"col-sm-12 message-main-sender\">\
-	<div class=\"sender\">\
-	<div class=\"message-text\">" +
-	query.value +
-	"</div>\
-	<span class=\"message-time pull-left\">"
-	+ date.getHours() + ":" + date.getMinutes() +
-	"</span>\
-	</div>\
-	</div>\
-	</div>";
-	query.value = '';
-	console.log(query.value);
-	html.innerHTML = html.innerHTML + htmlResponse;
-});
-
-function replyMain(e){
-	var key = e.which || e.keyCode;
-    if (key === 13 && query.value != "") { // 13 is enter
-    	var date = new Date();
-    	var htmlResponse	=	"<div class=\"row message-body\">\
-    	<div class=\"col-sm-12 message-main-sender\">\
-    	<div class=\"sender\">\
-    	<div class=\"message-text\">" +
-    	query.value +
-    	"</div><span class=\"message-time pull-left\">"
-    	+ date.getHours() + ":" + date.getMinutes() +
-    	"</span>\
-    	</div>\
-    	</div>\
-    	</div>";
-    	html.innerHTML = html.innerHTML + htmlResponse;
-    	socket.emit('chat request', query.value);
-    	query.value = '';
-    	console.log(query.value);
-    	}
-};
-if(is_chrome)
-{
-	const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-	const oSpeechRecognition = new SpeechRecognition();
-	oSpeechRecognition.lang = 'en-US';
-	oSpeechRecognition.interimResults = false;
-	oSpeechRecognition.maxAlternatives = 1;
-
-	document.querySelector('#microphone-send').addEventListener('click', () => {
-		oSpeechRecognition.start();
+	socket.on('ai response', function (response) {
+		sendMessageReceiver(response);
 	});
 
-	oSpeechRecognition.addEventListener('result', (e) => {
-		console.log('Finalized the Result.');
+	function sendMessageSender() {
+		let message = $('#comment').val();
+		if (message != '') {
+			$('#conversation').append(createMessage(message));
 
-		let previous = e.results.length - 1;
-		let text = e.results[previous][0].transcript;
-
-		query.textContent = text;
-		console.log('Confidence: ' + e.results[0][0].confidence);
-		console.log(e);
-	});
-
-	oSpeechRecognition.addEventListener('speechend', () => {
-		oSpeechRecognition.stop();
-	});
-
-	oSpeechRecognition.addEventListener('error', (e) => {
-		outputBot.textContent = 'Error: ' + e.error;
-	});
-}
-function speak(text) {
-	var utterance = new SpeechSynthesisUtterance(text);
-
-    speechSynthesis.speak(utterance);
-	// const speechSynthesis = window.speechSynthesis;
-	// const oSpeechSynthesisUtternace = new SpeechSynthesisUtterance();
-	// oSpeechSynthesisUtternace.text = text;
-	// speechSynthesis.speak(oSpeechSynthesisUtternace);
-}
-
-socket.on('ai response', function(response) {
-	if(is_chrome)
-	{
-		speak(response);
+			socket.emit('chat request', message);
+			$('#comment').val('');
+			console.log(message);
+		}
 	}
-	speak(response);
-	var date = new Date();
-	if(response == '') response = '(No answer...)';
-	var htmlResponse = "<div class=\"row message-body\">\
-	<div class=\"col-sm-12 message-main-receiver\">\
-	<div class=\"receiver\">\
-	<div class=\"message-text\">" +
-	response +
-	"</div>\
-	<span class=\"message-time pull-left\">"
-	+ date.getHours() + ":" + date.getMinutes() +
-	"</span>\
-	</div>\
-	</div>\
-	</div>";
-	html.innerHTML = html.innerHTML + htmlResponse;
-});
 
+	function sendMessageReceiver(message) {
+		speak(message);
+		$('#conversation').append(createMessage(message, false));
+	}
+
+	function speak(text) {
+		var utterance = new SpeechSynthesisUtterance(text);
+		speechSynthesis.speak(utterance);
+	}
+
+	function createMessage(messageText, isSender = true) {
+		const classMessage = isSender ? 'sender' : 'receiver';
+		const date = new Date();
+		return `
+			<div class="row message-body">
+				<div class="col-sm-12 message-main-${classMessage}">
+					<div class="${classMessage}">
+					<div class="message-text">
+						${messageText}
+					</div>
+						<span class="message-time pull-${isSender ? 'left' : 'right'}">
+							${date.getHours()}: ${date.getMinutes()} 
+						</span>
+					</div>
+				</div>
+			</div>"
+		`;
+	}
+
+
+})
