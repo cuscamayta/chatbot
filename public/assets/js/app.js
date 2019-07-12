@@ -54,7 +54,7 @@ $(document).ready(() => {
 						</span>
 					</div>
 				</div>
-			</div>"
+			</div>
 		`;
 	}
 
