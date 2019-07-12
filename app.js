@@ -8,7 +8,7 @@ require('./routes')(app);
 
 app.use(express.static(__dirname + '/public'));
 
-server.listen(3009, function () {
+server.listen(process.env.PORT || 5000, () => {
   console.log('listening on  port %d', server.address().port);
 });
 
