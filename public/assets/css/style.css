@@ -349,7 +349,7 @@ span {
 
 .message-main-sender {
   padding: 3px 20px !important;
-  margin-left: 28% !important;
+  margin-left: 26% !important;
   max-width: 75%;
 }
 
@@ -471,7 +471,7 @@ span {
   box-shadow: none;
 }
 
-@media screen and (max-width: 700px) {
+/* @media screen and (max-width: 700px) {
   .app {
     top: 0;
     height: 100%;
@@ -543,7 +543,7 @@ span {
     color: rgba(0, 0, 0, .4);
     vertical-align: baseline;
   }
-  /*Conversation*/
+ 
   .conversation {
     padding: 0 !important;
     margin: 0 !important;
@@ -584,7 +584,7 @@ span {
     padding: 5px 2px 5px 0 !important;
     font-size: 1.8em !important;
   }
-}
+} */
 
 * {
   margin: 0;
@@ -602,5 +602,5 @@ body {
 }
 
 .container{
-  padding: 20px !important;
+  padding: 10px 200px 0 200px !important;
 }
